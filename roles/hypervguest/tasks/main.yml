@@ -1,0 +1,26 @@
+- name: Configure kernel boot parameters
+  vars:
+          grub_config_file_name: HYPER-V.cfg
+
+  copy:
+          src: ./files/{{ grub_config_file_name }}
+          dest: /etc/default/grub.d/{{ grub_config_file_name }}
+          force: yes
+          owner: root
+          group: root
+          mode: 0644
+  register: grubcfg
+
+- name: Update grub when grub configuration changes
+  command: update-grub
+  when: grubcfg.changed 
+
+- name: install hyper-v guest vm tools
+  apt:
+          name: "{{ packages }}"
+          state: latest
+  vars:
+          packages:
+                  - linux-image-virtual
+                  - linux-tools-virtual
+                  - linux-cloud-tools-virtual

@@ -1,0 +1,11 @@
+- name: Configure kernel boot parameters
+  vars:
+          grub_config_file_name: HYPER-V.cfg
+
+  copy:
+          src: ./files/{{ grub_config_file_name }}
+          dest: /etc/default/grub.d/{{ grub_config_file_name }}
+          force: yes
+          owner: root
+          group: root
+          mode: 0644

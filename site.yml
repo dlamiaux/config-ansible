@@ -1,0 +1,8 @@
+- hosts: all
+  become: yes
+  tasks:
+          - name: Common role
+            import_role:
+                    name: common
+
+- import_playbook: hypervguests.yml

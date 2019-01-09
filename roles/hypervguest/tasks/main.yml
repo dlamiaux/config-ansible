@@ -14,3 +14,13 @@
 - name: Update grub when grub configuration changes
   command: update-grub
   when: grubcfg.changed 
+
+- name: install hyper-v guest vm tools
+  apt:
+          name: "{{ packages }}"
+          state: latest
+  vars:
+          packages:
+                  - linux-image-virtual
+                  - linux-tools-virtual
+                  - linux-cloud-tools-virtual

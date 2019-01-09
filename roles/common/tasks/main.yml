@@ -1,0 +1,15 @@
+- name: update package manager packages
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+    force_apt_get: yes
+
+- name: check if server needs to be rebooted
+  stat:
+    path: /var/run/reboot-required
+  register: reboot
+
+- name: reboot system if required
+  reboot:
+  when: reboot.stat.exists

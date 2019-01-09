@@ -9,3 +9,8 @@
           owner: root
           group: root
           mode: 0644
+  register: grubcfg
+
+- name: Update grub when grub configuration changes
+  command: update-grub
+  when: grubcfg.changed 

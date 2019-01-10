@@ -19,3 +19,8 @@
           mode: 0644
           validate: /usr/sbin/named-checkconf %s
           backup: yes
+  register: options
+
+- name: reload bind configuration
+  command: rndc reconfig
+  when: options.changed

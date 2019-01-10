@@ -3,3 +3,13 @@
           name: bind9
           state: latest
           update_cache: yes
+
+- name: Configure BIND options
+  template:
+          src: ../templates/{{ bind_options_file_name }}
+          dest: "{{ bind_conf_directory }}/{{ bind_options_file_name }}"
+          owner: root
+          group: bind
+          mode: 0644
+          validate: /usr/sbin/named-checkconf %s
+          backup: yes

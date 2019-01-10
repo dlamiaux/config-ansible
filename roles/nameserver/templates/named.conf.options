@@ -1,0 +1,21 @@
+acl "trusted" {
+{% for address in trusted_dns_clients %}
+	{{ address }};
+{% endfor %}
+};
+
+options {
+	directory "/var/cache/bind";
+	recursion yes;
+	allow-recursion { trusted; };
+	allow-transfer { none; };
+
+	forwarders {
+{% for forwarder in dns_forwarders %}
+		{{ forwarder }};
+{% endfor %}
+	};
+
+	auth-nxdomain no;
+	dnssec-validation auto;
+};

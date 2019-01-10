@@ -1,0 +1,5 @@
+- name: Install bind daemon
+  apt:
+          name: bind9
+          state: latest
+          update_cache: yes

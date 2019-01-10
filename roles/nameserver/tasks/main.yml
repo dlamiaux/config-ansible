@@ -1,16 +1,16 @@
-- name: Install bind daemon
+- name: install bind daemon
   apt:
           name: bind9
           state: latest
           update_cache: yes
 
-- name: Start the bind daemon and make sure it starts on boot
+- name: start the bind daemon and make sure it starts on boot
   service:
           name: bind9
           state: started
           enabled: yes
 
-- name: Configure BIND options
+- name: configure BIND options
   template:
           src: ../templates/{{ bind_options_file_name }}
           dest: "{{ bind_conf_directory }}/{{ bind_options_file_name }}"

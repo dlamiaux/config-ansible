@@ -4,6 +4,11 @@
           state: latest
           update_cache: yes
 
+- name: Start the bind daemon
+  service:
+          name: bind9
+          state: started
+
 - name: Configure BIND options
   template:
           src: ../templates/{{ bind_options_file_name }}

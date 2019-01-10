@@ -1,0 +1,15 @@
+{% for forward_zone in forward_dns_zones %}
+
+zone "{{ forward_zone }}" {
+	type {{ dns_order}};
+	file "{{ bind_conf_directory }}/zones/db.{{ forward_zone }}"
+	allow-transfer {
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+		{{ nameserver }};
+{% endif %}
+{% endfor %}
+	};
+};
+
+{% endfor %}

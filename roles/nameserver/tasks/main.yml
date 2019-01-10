@@ -21,6 +21,14 @@
           backup: yes
   register: options
 
+- name: configure BIND zones
+  template:
+        src: ../templates/{{ bind_zone_conf_name }}
+        dest: /tmp/{{ bind_zone_conf_name }}
+        owner: root
+        group: bind
+        mode: 0644
+
 - name: reload bind configuration
   command: rndc reconfig
   when: options.changed

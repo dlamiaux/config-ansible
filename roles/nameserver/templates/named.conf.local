@@ -11,5 +11,34 @@ zone "{{ forward_zone }}" {
 {% endfor %}
 	};
 };
+{% endfor %}
 
+{% for reverse_zone in reverse_ipv4_dns_zones %}
+{% set addressoctets = reverse_zone.split('.') %}
+zone "{% for octet in addressoctets|reverse %}{{ octet }}.{% endfor %}in-addr.arpa" {
+	type {{ dns_order }};
+	file "{{ bind_conf_directory }}/zones/db.{{ reverse_zone }}
+	allow-transfer {
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+		{{ nameserver }};
+{% endif %}
+{% endfor %}
+	};
+};
+{% endfor %}
+
+{% for reverse_zone in reverse_ipv6_dns_zones %}
+{% set hexipv6addr = reverse_zone.replace(':','') %}
+zone "{% for nibble in hexipv6addr|reverse %}{{ nibble }}.{% endfor %}ip6.arpa" {
+	type {{ dns_order }};
+	file "{{ bind_conf_directory }}/zones/db.{{ reverse_zone }}
+	allow-transfer {
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+		{{ nameserver.replace(':','.') }};
+{% endif %}
+{% endfor %}
+	};
+};
 {% endfor %}

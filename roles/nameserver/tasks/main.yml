@@ -21,13 +21,14 @@
           backup: yes
   register: options
 
-- name: configure BIND zones
+- name: configure master BIND zones
   template:
-        src: ../templates/{{ bind_zone_conf_name }}
+        src: ../templates/{{ bind_zone_conf_name }}.master
         dest: /tmp/{{ bind_zone_conf_name }}
         owner: root
         group: bind
         mode: 0644
+  when: dns_order == "master"
 
 - name: reload bind configuration
   command: rndc reconfig

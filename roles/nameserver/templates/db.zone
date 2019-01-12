@@ -1,0 +1,48 @@
+$TTL	{{ dns_default_ttl }}
+{{ item.zone }}.	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
+				{{ inventory.stat.mtime|int }}	; Serial Number
+				{{ dns_soa_refresh }}	; Refresh
+				{{ dns_soa_retry }}	; Retry
+				{{ dns_soa_expire }}	; Expire
+				{{ dns_soa_negcache }}	; Negative Cache TTL
+)
+
+; Name Servers
+{% for nameserver in groups['nameservers'] %}
+@	IN	NS	{{ nameserver }}.
+{% endfor %}
+
+{% if item.type == "forward" %}
+; NS Glue Records
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['ipv4_address'] %}
+{{ nameserver }}.	IN	A	{{ hostvars[nameserver]['ipv4_address'] }}
+{% endif %}
+{% if hostvars[nameserver]['ipv6_address'] %}
+{{ nameserver }}.	IN	AAAA	{{ hostvars[nameserver]['ipv6_address'] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if item.type == "forward" %}
+; Descriptive CNAME records
+{% for host in groups['all'] %}
+{% if hostvars[host]['CNAME'] %}
+{{ hostvars[host]['CNAME'] }}.	IN	CNAME	{{ host }}.
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if item.type == "reverse" %}
+; PTR Records
+{% if item.family == "ipv4" %}
+{% for nameserver in groups['nameservers'] %}
+{{ hostvars[nameserver]['ipv4_address'].replace(item.name+".","").split(".")|reverse|join(".") }}	IN	PTR	{{ nameserver }}
+{% endfor %}
+{% endif %}
+{% if item.family == "ipv6" %}
+{% for nameserver in groups['nameservers'] %}
+{{ hostvars[nameserver]['ipv6_address'].replace(item.name,"").replace(":","")|reverse|join(".") }}	IN	PTR	{{ nameserver }}
+{% endfor %}
+{% endif %}
+{% endif %}

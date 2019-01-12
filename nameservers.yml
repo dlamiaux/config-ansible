@@ -1,0 +1,6 @@
+- hosts: nameservers
+  become: yes
+
+  tasks:
+          - include_role:
+                  name: nameserver

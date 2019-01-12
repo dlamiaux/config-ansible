@@ -1,0 +1,59 @@
+- name: install bind daemon
+  apt:
+          name: bind9
+          state: latest
+          update_cache: yes
+
+- name: start the bind daemon and make sure it starts on boot
+  service:
+          name: bind9
+          state: started
+          enabled: yes
+
+- name: configure BIND options
+  template:
+          src: ../templates/{{ bind_options_file_name }}
+          dest: "{{ bind_conf_directory }}/{{ bind_options_file_name }}"
+          owner: root
+          group: bind
+          mode: 0644
+          validate: /usr/sbin/named-checkconf %s
+          backup: yes
+  register: options
+
+- name: configure BIND zones
+  template:
+        src: ../templates/{{ bind_zone_conf_name }}
+        dest: "{{ bind_conf_directory }}/{{ bind_zone_conf_name }}"
+        owner: root
+        group: bind
+        mode: 0644
+        validate: /usr/sbin/named-checkconf %s
+        backup: yes
+  register: zones
+
+- name: Check last time inventory was updated
+  local_action: stat path={{ inventory_file_path }}
+  register: inventory
+
+- name: populate zone files
+  template:
+          src: ../templates/db.zone
+          dest: "{{bind_conf_directory }}/zones/db.{{ item.name|replace(':','.') }}"
+          owner: root
+          group: bind
+          mode: 0644
+          validate: /usr/sbin/named-checkzone {{ item.zone }} %s
+          backup: yes
+  loop: "{{ dns_lookup_zones }}"
+  when: dns_order == "master"
+  register: zone_database
+
+- name: reload bind configuration
+  command: rndc reconfig
+  when: options.changed or zones.changed
+
+- name: reload zone file
+  command: rndc reload {{ item.item.zone }}
+  when: item.changed
+  loop: "{{ zone_database.results }}"

@@ -1,0 +1,25 @@
+{% for dns_zone in dns_lookup_zones %}
+zone "{{ dns_zone.zone }}" {
+	type {{ dns_order }};
+	file "{% if dns_order == 'master' %}{{ bind_conf_directory }}/zones/{% endif %}db.{{ dns_zone.name.replace(':','.') }}";
+{% if dns_order == "master" %}
+	allow-transfer {
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['dns_order'] == "slave" %}
+		{{ hostvars[nameserver]['ansible_host'] }};
+{% endif %}
+{% endfor %}
+	};
+{% endif %}
+{% if dns_order == "slave" %}
+	masters {
+{% for nameserver in groups['nameservers'] %}
+{% if hostvars[nameserver]['dns_order'] == "master" %}
+		{{ hostvars[nameserver]['ansible_host'] }};
+{% endif %}
+{% endfor %}
+	};
+{% endif %}
+};
+
+{% endfor %}

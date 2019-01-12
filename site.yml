@@ -6,3 +6,4 @@
                     name: common
 
 - import_playbook: hypervguests.yml
+- import_playbook: nameservers.yml

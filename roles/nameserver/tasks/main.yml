@@ -21,9 +21,9 @@
           backup: yes
   register: options
 
-- name: configure master BIND zones
+- name: configure BIND zones
   template:
-        src: ../templates/{{ bind_zone_conf_name }}.{{ dns_order }}
+        src: ../templates/{{ bind_zone_conf_name }}
         dest: "{{ bind_conf_directory }}/{{ bind_zone_conf_name }}"
         owner: root
         group: bind

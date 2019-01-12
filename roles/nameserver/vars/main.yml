@@ -1,3 +1,4 @@
+inventory_file_path: /etc/ansible/hosts
 bind_conf_directory: /etc/bind
 bind_options_file_name: named.conf.options
 bind_zone_conf_name: named.conf.local

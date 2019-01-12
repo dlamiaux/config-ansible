@@ -11,7 +11,7 @@
 {% endif %}
 $TTL	{{ dns_default_ttl }}
 {{ zone_name }}.	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
-				{{ serial_number }}	; Serial Number
+				{{ inventory.stat.mtime|int }}	; Serial Number
 				{{ dns_soa_refresh }}	; Refresh
 				{{ dns_soa_retry }}	; Retry
 				{{ dns_soa_expire }}	; Expire

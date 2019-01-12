@@ -1,16 +1,5 @@
-{% if item.type == "forward" %}
-{% set zone_name = item.name %}
-{% endif %}
-{% if item.type == "reverse" %}
-{% if item.family == "ipv4" %}
-{% set zone_name = item.name.split('.')|reverse|join(".") + ".in-addr.arpa" %}
-{% endif %}
-{% if item.family == "ipv6" %}
-{% set zone_name = item.name|replace(':','')|reverse|join(".") + ".ip6.arpa" %}
-{% endif %}
-{% endif %}
 $TTL	{{ dns_default_ttl }}
-{{ zone_name }}.	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
+{{ item.zone }}.	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
 				{{ inventory.stat.mtime|int }}	; Serial Number
 				{{ dns_soa_refresh }}	; Refresh
 				{{ dns_soa_retry }}	; Retry

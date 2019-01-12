@@ -1,3 +1,9 @@
 bind_conf_directory: /etc/bind
 bind_options_file_name: named.conf.options
 bind_zone_conf_name: named.conf.local
+dns_default_ttl: 86400
+dns_serial_number: 2018122103
+dns_soa_refresh: 3600
+dns_soa_retry: 180
+dns_soa_expire: 1209600
+dns_soa_negcache: 1800

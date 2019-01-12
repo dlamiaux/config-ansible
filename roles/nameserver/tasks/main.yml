@@ -32,6 +32,16 @@
         backup: yes
   register: zones
 
+- name: populate zone files
+  template:
+          src: ../templates/db.zone
+          dest: /tmp/db.{{ item.name|replace(":",".") }}
+          owner: root
+          group: bind
+          mode: 0644
+  loop: "{{ dns_lookup_zones }}"
+  when: dns_order == "master"
+
 - name: reload bind configuration
   command: rndc reconfig
   when: options.changed or zones.changed

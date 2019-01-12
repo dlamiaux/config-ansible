@@ -1,11 +1,11 @@
 {% for forward_zone in forward_dns_zones %}
 
 zone "{{ forward_zone }}" {
-	type master;
-	file "{{ bind_conf_directory }}/zones/db.{{ forward_zone }}";
-	allow-transfer {
+	type slave;
+	file "db.{{ forward_zone }}";
+	masters {
 {% for nameserver in groups['nameservers'] %}
-{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+{% if hostvars[nameserver]['dns_order'] is eq "master" %}
 		{{ hostvars[nameserver]['ansible_host'] }};
 {% endif %}
 {% endfor %}
@@ -16,11 +16,11 @@ zone "{{ forward_zone }}" {
 {% for reverse_zone in reverse_ipv4_dns_zones %}
 {% set addressoctets = reverse_zone.split('.') %}
 zone "{% for octet in addressoctets|reverse %}{{ octet }}.{% endfor %}in-addr.arpa" {
-	type master;
-	file "{{ bind_conf_directory }}/zones/db.{{ reverse_zone }}";
-	allow-transfer {
+	type slave;
+	file "db.{{ reverse_zone }}";
+	masters {
 {% for nameserver in groups['nameservers'] %}
-{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+{% if hostvars[nameserver]['dns_order'] is eq "master" %}
 		{{ hostvars[nameserver]['ansible_host'] }};
 {% endif %}
 {% endfor %}
@@ -31,11 +31,11 @@ zone "{% for octet in addressoctets|reverse %}{{ octet }}.{% endfor %}in-addr.ar
 {% for reverse_zone in reverse_ipv6_dns_zones %}
 {% set hexipv6addr = reverse_zone.replace(':','') %}
 zone "{% for nibble in hexipv6addr|reverse %}{{ nibble }}.{% endfor %}ip6.arpa" {
-	type master;
-	file "{{ bind_conf_directory }}/zones/db.{{ reverse_zone|replace(":", ".") }}";
-	allow-transfer {
+	type slave;
+	file "db.{{ reverse_zone|replace(":", ".") }}";
+	masters {
 {% for nameserver in groups['nameservers'] %}
-{% if hostvars[nameserver]['dns_order'] is eq "slave" %}
+{% if hostvars[nameserver]['dns_order'] is eq "master" %}
 		{{ hostvars[nameserver]['ansible_host'] }};
 {% endif %}
 {% endfor %}

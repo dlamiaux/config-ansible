@@ -52,7 +52,7 @@
           validate: /usr/sbin/named-checkzone {{ item.zone }} %s
           backup: yes
   loop: "{{ dns_lookup_zones }}"
-  when: dns_order == "master" or item.zone_root
+  when: (dns_order == "master") or (item.zone_root is defined and item.zone_root == true)
   register: zone_database
 
 - name: reload bind configuration

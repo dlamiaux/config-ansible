@@ -1,7 +1,14 @@
 {% for dns_zone in dns_lookup_zones %}
+{% if dns_zone.zone_root is defined and dns_zone.zone_root %}
+{% set dnszone_order = "master" %}
+{% else %}
+{% set dnszone_order = dns_order %}
+{% endif %}
+
 zone "{{ dns_zone.zone }}" {
-	type {{ dns_order }};
-	file "{% if dns_order == 'master' %}{{ bind_conf_directory }}/zones/{% endif %}db.{{ dns_zone.name.replace(':','.') }}";
+	type {{ dnszone_order }};
+	file "{% if dnszone_order == 'master' %}{{ bind_conf_directory }}/zones/{% endif %}db.{{ dns_zone.name.replace(':','.') }}";
+{% if dns_zone.zone_root is not defined or dns_zone.zone_root != true %}
 {% if dns_order == "master" %}
 	allow-transfer {
 {% for nameserver in groups['nameservers'] %}
@@ -19,6 +26,7 @@ zone "{{ dns_zone.zone }}" {
 {% endif %}
 {% endfor %}
 	};
+{% endif %}
 {% endif %}
 };
 

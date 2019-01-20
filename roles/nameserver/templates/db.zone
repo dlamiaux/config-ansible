@@ -25,7 +25,7 @@ $ORIGIN {{ item.zone }}.
 {% endfor %}
 {% endif %}
 
-{% if item.type == "forward" %}
+{% if item.type == "forward"  and (item.zone_root is not defined or item.zone_root != true) %}
 ; Descriptive CNAME records
 {% for host in groups['all'] %}
 {% if hostvars[host]['CNAME'] %}

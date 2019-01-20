@@ -36,6 +36,12 @@
   local_action: stat path={{ inventory_file_path }}
   register: inventory
 
+- name: Ensure zones directory exists
+  file:
+    path: "{{bind_conf_directory }}/zones"
+    recurse: yes
+    state: directory
+
 - name: populate zone files
   template:
           src: ../templates/db.zone
@@ -46,7 +52,7 @@
           validate: /usr/sbin/named-checkzone {{ item.zone }} %s
           backup: yes
   loop: "{{ dns_lookup_zones }}"
-  when: dns_order == "master"
+  when: dns_order == "master" or item.zone_root
   register: zone_database
 
 - name: reload bind configuration

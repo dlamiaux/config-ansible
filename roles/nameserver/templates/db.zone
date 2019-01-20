@@ -1,5 +1,6 @@
 $TTL	{{ dns_default_ttl }}
-{{ item.zone }}.	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
+$ORIGIN {{ item.zone }}.
+@	IN	SOA	{{ inventory_hostname }}.	{{ dns_zone_hostmaster }}. (
 				{{ inventory.stat.mtime|int }}	; Serial Number
 				{{ dns_soa_refresh }}	; Refresh
 				{{ dns_soa_retry }}	; Retry
@@ -33,16 +34,23 @@ $TTL	{{ dns_default_ttl }}
 {% endfor %}
 {% endif %}
 
+{% if item.zone_root is defined and item.zone_root %}
+; host CNAME records
+{% for host in groups['all'] %}
+{{ host | regex_replace('\..*$','') }}	IN	CNAME	{{ host }}.
+{% endfor %}
+{% endif %}
+
 {% if item.type == "reverse" %}
 ; PTR Records
 {% if item.family == "ipv4" %}
 {% for nameserver in groups['nameservers'] %}
-{{ hostvars[nameserver]['ipv4_address'].replace(item.name+".","").split(".")|reverse|join(".") }}	IN	PTR	{{ nameserver }}
+{{ hostvars[nameserver]['ipv4_address'].replace(item.name+".","").split(".")|reverse|join(".") }}	IN	PTR	{{ nameserver }}.
 {% endfor %}
 {% endif %}
 {% if item.family == "ipv6" %}
 {% for nameserver in groups['nameservers'] %}
-{{ hostvars[nameserver]['ipv6_address'].replace(item.name,"").replace(":","")|reverse|join(".") }}	IN	PTR	{{ nameserver }}
+{{ hostvars[nameserver]['ipv6_address'].replace(item.name,"").replace(":","")|reverse|join(".") }}	IN	PTR	{{ nameserver }}.
 {% endfor %}
 {% endif %}
 {% endif %}
